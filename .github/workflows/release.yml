@@ -1,4 +1,4 @@
-name: Build and Release
+name: Release
 
 on:
   push:
@@ -7,74 +7,34 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release (e.g., v1.0.2)'
+        description: 'Tag to release (e.g., v1.0.3)'
         required: true
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: macos-latest
-            target: bun-darwin-arm64
-            artifact: dotenvx-deploy-macos-arm64
-          - os: macos-15-large
-            target: bun-darwin-x64
-            artifact: dotenvx-deploy-macos-x64
-          - os: ubuntu-latest
-            target: bun-linux-x64
-            artifact: dotenvx-deploy-linux-x64
-          - os: windows-latest
-            target: bun-windows-x64
-            artifact: dotenvx-deploy-windows-x64.exe
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build binary
-        run: bun build ./bin/cli.js --compile --target=${{ matrix.target }} --outfile ${{ matrix.artifact }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}
-
   release:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: dist
+          node-version: '20'
 
-      - name: Prepare release files
-        run: |
-          mkdir -p release
-          find dist -type f -exec mv {} release/ \;
-          ls -la release/
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify CLI works
+        run: node bin/cli.js --version
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          files: release/*
           body_path: CHANGELOG.md
           draft: false
           prerelease: false

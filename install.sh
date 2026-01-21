@@ -6,74 +6,59 @@
 set -e
 
 REPO="DmacMcgreg/dotenvx-deploy"
-VERSION="${VERSION:-latest}"
-INSTALL_DIR="${HOME}/.local/bin"
-
-# Detect OS and architecture
-OS="$(uname -s)"
-ARCH="$(uname -m)"
-
-case "$OS" in
-  Darwin)
-    case "$ARCH" in
-      x86_64) BINARY="dotenvx-deploy-macos-x64" ;;
-      arm64)  BINARY="dotenvx-deploy-macos-arm64" ;;
-      *)      echo "Unsupported architecture: $ARCH"; exit 1 ;;
-    esac
-    ;;
-  Linux)
-    case "$ARCH" in
-      x86_64) BINARY="dotenvx-deploy-linux-x64" ;;
-      *)      echo "Unsupported architecture: $ARCH"; exit 1 ;;
-    esac
-    ;;
-  MINGW*|MSYS*|CYGWIN*)
-    BINARY="dotenvx-deploy-windows-x64.exe"
-    INSTALL_DIR="${HOME}/bin"
-    ;;
-  *)
-    echo "Unsupported OS: $OS"
-    exit 1
-    ;;
-esac
+INSTALL_DIR="${HOME}/.dotenvx-deploy"
+BIN_DIR="${HOME}/.local/bin"
 
 echo "🔐 Installing dotenvx-deploy..."
-echo "   OS: $OS ($ARCH)"
 
-# Create install directory
-mkdir -p "$INSTALL_DIR"
-
-# Get download URL
-if [ "$VERSION" = "latest" ]; then
-  DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/${BINARY}"
-else
-  DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY}"
-fi
-
-echo "📦 Downloading from: $DOWNLOAD_URL"
-
-# Download binary
-if command -v curl &> /dev/null; then
-  curl -fsSL "$DOWNLOAD_URL" -o "${INSTALL_DIR}/dotenvx-deploy"
-elif command -v wget &> /dev/null; then
-  wget -q "$DOWNLOAD_URL" -O "${INSTALL_DIR}/dotenvx-deploy"
-else
-  echo "Error: curl or wget required"
+# Check for Node.js
+if ! command -v node &> /dev/null; then
+  echo "❌ Node.js is required but not installed."
+  echo "   Install Node.js 18+ from https://nodejs.org"
   exit 1
 fi
 
+NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+if [ "$NODE_VERSION" -lt 18 ]; then
+  echo "❌ Node.js 18+ is required (found v$NODE_VERSION)"
+  exit 1
+fi
+
+# Create directories
+mkdir -p "$INSTALL_DIR"
+mkdir -p "$BIN_DIR"
+
+# Clone or update repository
+if [ -d "$INSTALL_DIR/.git" ]; then
+  echo "📦 Updating existing installation..."
+  cd "$INSTALL_DIR"
+  git fetch origin main
+  git reset --hard origin/main
+else
+  echo "📦 Cloning repository..."
+  rm -rf "$INSTALL_DIR"
+  git clone "https://github.com/${REPO}.git" "$INSTALL_DIR"
+fi
+
+# Install dependencies
+cd "$INSTALL_DIR"
+echo "📦 Installing dependencies..."
+npm install --production
+
+# Create symlinks
+echo "🔗 Creating symlinks..."
+ln -sf "$INSTALL_DIR/bin/cli.js" "$BIN_DIR/dotenvx-deploy"
+ln -sf "$INSTALL_DIR/bin/cli.js" "$BIN_DIR/dxd"
+
 # Make executable
-chmod +x "${INSTALL_DIR}/dotenvx-deploy"
+chmod +x "$INSTALL_DIR/bin/cli.js"
 
-# Create short alias
-ln -sf "${INSTALL_DIR}/dotenvx-deploy" "${INSTALL_DIR}/dxd"
-
-# Check if INSTALL_DIR is in PATH
-if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+# Check if BIN_DIR is in PATH
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
   echo ""
   echo "⚠️  Add this to your shell profile (.bashrc, .zshrc, etc.):"
   echo ""
-  echo "    export PATH=\"$INSTALL_DIR:\$PATH\""
+  echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
   echo ""
 fi
 
@@ -85,4 +70,6 @@ echo "  dotenvx-deploy init      # Initialize encryption"
 echo "  dotenvx-deploy deploy    # Deploy to Vercel"
 echo "  dotenvx-deploy status    # Check status"
 echo "  dxd --help               # Short alias"
+echo ""
+echo "To update: run this script again"
 echo ""

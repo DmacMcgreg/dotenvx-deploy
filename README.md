@@ -6,24 +6,18 @@ Automates the setup process for encrypted environment variables in Next.js and V
 
 ## Installation
 
-### Quick Install (Recommended)
+**Requires Node.js 18+**
 
-Download the standalone binary (includes runtime, no dependencies needed):
+### Quick Install (Recommended)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/DmacMcgreg/dotenvx-deploy/main/install.sh | bash
 ```
 
-Or install a specific version:
-
-```bash
-VERSION=v1.0.1 curl -fsSL https://raw.githubusercontent.com/DmacMcgreg/dotenvx-deploy/main/install.sh | bash
-```
-
 ### From npm/GitHub
 
 ```bash
-# Install globally (requires Node.js 18+)
+# Install globally
 npm install -g github:DmacMcgreg/dotenvx-deploy
 
 # Or use npx for one-off usage
@@ -37,9 +31,12 @@ git clone https://github.com/DmacMcgreg/dotenvx-deploy.git
 cd dotenvx-deploy
 npm install
 npm link
+```
 
-# Or build standalone binary (requires Bun)
-bun run build
+### Uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/DmacMcgreg/dotenvx-deploy/main/uninstall.sh | bash
 ```
 
 ## Quick Start
@@ -143,7 +140,7 @@ Options:
 
 ### `bw-save`
 
-Save private keys to Bitwarden.
+Save private keys to Bitwarden. See [Bitwarden CLI Setup](#bitwarden-cli-setup) below.
 
 ```bash
 dotenvx-deploy bw-save [options]
@@ -151,18 +148,6 @@ dotenvx-deploy bw-save [options]
 Options:
   -e, --env <environment>  Environment to save (default: all)
   --folder <folder>        Bitwarden folder name (default: dotenvx-keys)
-```
-
-**Prerequisites:**
-```bash
-# Install Bitwarden CLI
-npm install -g @bitwarden/cli
-# or
-brew install bitwarden-cli
-
-# Login and unlock
-bw login
-export BW_SESSION=$(bw unlock --raw)
 ```
 
 **Key naming:**
@@ -173,7 +158,7 @@ Keys are stored using the pattern `{package.json name}/{environment}`:
 
 ### `bw-pull`
 
-Pull private keys from Bitwarden.
+Pull private keys from Bitwarden. See [Bitwarden CLI Setup](#bitwarden-cli-setup) below.
 
 ```bash
 dotenvx-deploy bw-pull [options]
@@ -203,6 +188,63 @@ dotenvx-deploy status
 - External tool availability (Vercel CLI, Bitwarden CLI)
 - Security checks (gitignore configuration)
 - Recommendations
+
+## Bitwarden CLI Setup
+
+The `bw-save` and `bw-pull` commands require the Bitwarden CLI to be installed and authenticated. Follow these steps:
+
+### 1. Install Bitwarden CLI
+
+```bash
+# Using npm
+npm install -g @bitwarden/cli
+
+# Or using Homebrew (macOS/Linux)
+brew install bitwarden-cli
+```
+
+### 2. Login to Bitwarden
+
+```bash
+bw login
+```
+
+This will prompt for your email and master password. If you use 2FA, you'll be prompted for that as well.
+
+### 3. Unlock Your Vault
+
+After logging in, your vault is still locked. You need to unlock it and set the session token:
+
+```bash
+# This unlocks your vault and exports the session token
+export BW_SESSION=$(bw unlock --raw)
+```
+
+**Note:** The `export` command only works in bash/zsh. For other shells:
+- **Fish:** `set -x BW_SESSION (bw unlock --raw)`
+- **PowerShell:** `$env:BW_SESSION = (bw unlock --raw)`
+- **Windows CMD:** Run `bw unlock` and manually set `BW_SESSION` with the output
+
+### 4. Verify Setup
+
+```bash
+bw status
+```
+
+You should see `"status": "unlocked"`.
+
+### Session Expiration
+
+The `BW_SESSION` token expires when you close your terminal. You'll need to unlock again:
+
+```bash
+export BW_SESSION=$(bw unlock --raw)
+```
+
+**Tip:** Add this alias to your shell config for convenience:
+```bash
+alias bwunlock='export BW_SESSION=$(bw unlock --raw)'
+```
 
 ## Workflows
 
