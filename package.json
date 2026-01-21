@@ -1,6 +1,6 @@
 {
   "name": "dotenvx-deploy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for managing dotenvx encryption with Vercel deployment and Bitwarden integration",
   "type": "module",
   "bin": {
@@ -8,7 +8,13 @@
     "dxd": "./bin/cli.js"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "build": "bun build ./bin/cli.js --compile --outfile dist/dotenvx-deploy",
+    "build:all": "npm run build:macos && npm run build:macos-arm && npm run build:linux && npm run build:windows",
+    "build:macos": "bun build ./bin/cli.js --compile --target=bun-darwin-x64 --outfile dist/dotenvx-deploy-macos-x64",
+    "build:macos-arm": "bun build ./bin/cli.js --compile --target=bun-darwin-arm64 --outfile dist/dotenvx-deploy-macos-arm64",
+    "build:linux": "bun build ./bin/cli.js --compile --target=bun-linux-x64 --outfile dist/dotenvx-deploy-linux-x64",
+    "build:windows": "bun build ./bin/cli.js --compile --target=bun-windows-x64 --outfile dist/dotenvx-deploy-windows-x64.exe"
   },
   "keywords": [
     "dotenvx",

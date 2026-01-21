@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-01-21
+
+### Fixed
+
+- Fix ES module compatibility issue with `require('fs')` in `findAllEnvFiles`
+- Use proper ES module imports for `readdirSync`
+
+### Changed
+
+- Add standalone binary builds using Bun compiler
+- Binaries now include runtime - no Node.js/Bun installation required
+- Updated install script to download pre-compiled binaries from GitHub Releases
+- Support for macOS (x64, ARM64), Linux (x64), and Windows (x64)
+
+### Added
+
+- Build scripts for cross-platform compilation (`bun run build:all`)
+- Platform-specific binary naming convention
+
 ## [1.0.0] - 2026-01-21
 
 ### Added
@@ -67,4 +86,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bitwarden integration for secure key backup and sharing
 - Key rotation support for security best practices
 
+[1.0.1]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.1
 [1.0.0]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.0

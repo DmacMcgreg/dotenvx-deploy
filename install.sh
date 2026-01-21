@@ -6,44 +6,74 @@
 set -e
 
 REPO="DmacMcgreg/dotenvx-deploy"
-INSTALL_DIR="${HOME}/.dotenvx-deploy"
-BIN_DIR="${HOME}/.local/bin"
+VERSION="${VERSION:-latest}"
+INSTALL_DIR="${HOME}/.local/bin"
+
+# Detect OS and architecture
+OS="$(uname -s)"
+ARCH="$(uname -m)"
+
+case "$OS" in
+  Darwin)
+    case "$ARCH" in
+      x86_64) BINARY="dotenvx-deploy-macos-x64" ;;
+      arm64)  BINARY="dotenvx-deploy-macos-arm64" ;;
+      *)      echo "Unsupported architecture: $ARCH"; exit 1 ;;
+    esac
+    ;;
+  Linux)
+    case "$ARCH" in
+      x86_64) BINARY="dotenvx-deploy-linux-x64" ;;
+      *)      echo "Unsupported architecture: $ARCH"; exit 1 ;;
+    esac
+    ;;
+  MINGW*|MSYS*|CYGWIN*)
+    BINARY="dotenvx-deploy-windows-x64.exe"
+    INSTALL_DIR="${HOME}/bin"
+    ;;
+  *)
+    echo "Unsupported OS: $OS"
+    exit 1
+    ;;
+esac
 
 echo "🔐 Installing dotenvx-deploy..."
+echo "   OS: $OS ($ARCH)"
 
-# Create directories
+# Create install directory
 mkdir -p "$INSTALL_DIR"
-mkdir -p "$BIN_DIR"
 
-# Clone or update repository
-if [ -d "$INSTALL_DIR/.git" ]; then
-  echo "📦 Updating existing installation..."
-  cd "$INSTALL_DIR"
-  git pull origin main
+# Get download URL
+if [ "$VERSION" = "latest" ]; then
+  DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/${BINARY}"
 else
-  echo "📦 Cloning repository..."
-  git clone "https://github.com/${REPO}.git" "$INSTALL_DIR"
+  DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${BINARY}"
 fi
 
-# Install dependencies
-cd "$INSTALL_DIR"
-echo "📦 Installing dependencies..."
-npm install --production
+echo "📦 Downloading from: $DOWNLOAD_URL"
 
-# Create symlink
-echo "🔗 Creating symlink..."
-ln -sf "$INSTALL_DIR/bin/cli.js" "$BIN_DIR/dotenvx-deploy"
-ln -sf "$INSTALL_DIR/bin/cli.js" "$BIN_DIR/dxd"
+# Download binary
+if command -v curl &> /dev/null; then
+  curl -fsSL "$DOWNLOAD_URL" -o "${INSTALL_DIR}/dotenvx-deploy"
+elif command -v wget &> /dev/null; then
+  wget -q "$DOWNLOAD_URL" -O "${INSTALL_DIR}/dotenvx-deploy"
+else
+  echo "Error: curl or wget required"
+  exit 1
+fi
 
 # Make executable
-chmod +x "$INSTALL_DIR/bin/cli.js"
+chmod +x "${INSTALL_DIR}/dotenvx-deploy"
 
-# Check if BIN_DIR is in PATH
-if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+# Create short alias
+ln -sf "${INSTALL_DIR}/dotenvx-deploy" "${INSTALL_DIR}/dxd"
+
+# Check if INSTALL_DIR is in PATH
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
   echo ""
   echo "⚠️  Add this to your shell profile (.bashrc, .zshrc, etc.):"
   echo ""
-  echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+  echo "    export PATH=\"$INSTALL_DIR:\$PATH\""
   echo ""
 fi
 

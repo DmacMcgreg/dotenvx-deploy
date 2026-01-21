@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Build output (binaries uploaded to GitHub Releases)
+dist/
+
 # Logs
 *.log
 npm-debug.log*

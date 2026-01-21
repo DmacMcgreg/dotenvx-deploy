@@ -6,23 +6,40 @@ Automates the setup process for encrypted environment variables in Next.js and V
 
 ## Installation
 
-### From GitHub (recommended for updates)
+### Quick Install (Recommended)
+
+Download the standalone binary (includes runtime, no dependencies needed):
 
 ```bash
-# Install globally
+curl -fsSL https://raw.githubusercontent.com/DmacMcgreg/dotenvx-deploy/main/install.sh | bash
+```
+
+Or install a specific version:
+
+```bash
+VERSION=v1.0.1 curl -fsSL https://raw.githubusercontent.com/DmacMcgreg/dotenvx-deploy/main/install.sh | bash
+```
+
+### From npm/GitHub
+
+```bash
+# Install globally (requires Node.js 18+)
 npm install -g github:DmacMcgreg/dotenvx-deploy
 
 # Or use npx for one-off usage
 npx github:DmacMcgreg/dotenvx-deploy <command>
 ```
 
-### From local clone
+### From source
 
 ```bash
 git clone https://github.com/DmacMcgreg/dotenvx-deploy.git
 cd dotenvx-deploy
 npm install
 npm link
+
+# Or build standalone binary (requires Bun)
+bun run build
 ```
 
 ## Quick Start

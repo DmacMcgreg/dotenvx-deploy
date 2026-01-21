@@ -15,7 +15,7 @@ const program = new Command();
 program
   .name('dotenvx-deploy')
   .description('CLI for managing dotenvx encryption with Vercel deployment and Bitwarden integration')
-  .version('1.0.0');
+  .version('1.0.1');
 
 program
   .command('init')
