@@ -147,6 +147,8 @@ dotenvx-deploy bw-save [options]
 
 Options:
   -e, --env <environment>  Environment to save (default: all)
+  -n, --name <name>        Version name (e.g., "client-a", "v2", "backup")
+  --note <note>            Add a note/description to the saved key
   --folder <folder>        Bitwarden folder name (default: dotenvx-keys)
 ```
 
@@ -155,6 +157,22 @@ Keys are stored using the pattern `{package.json name}/{environment}`:
 - `my-app/production`
 - `my-app/staging`
 - `my-app/development`
+
+With versioning (`--name`), keys are stored as:
+- `my-app/production/client-a`
+- `my-app/production/v2`
+
+**Examples:**
+```bash
+# Save default version
+dotenvx-deploy bw-save
+
+# Save as a named version with a note
+dotenvx-deploy bw-save --name client-a --note "Keys for Client A project"
+
+# Save backup before rotation
+dotenvx-deploy bw-save --name backup-2024-01 --note "Pre-rotation backup"
+```
 
 ### `bw-pull`
 
@@ -165,6 +183,7 @@ dotenvx-deploy bw-pull [options]
 
 Options:
   -e, --env <environment>  Environment to pull (default: all)
+  -n, --name <name>        Pull a specific version by name
   --folder <folder>        Bitwarden folder name (default: dotenvx-keys)
 ```
 
@@ -172,6 +191,45 @@ Options:
 - Setting up a new development machine
 - Restoring keys after accidental deletion
 - Team onboarding
+- Switching between different key versions
+
+**Examples:**
+```bash
+# Pull default/latest keys
+dotenvx-deploy bw-pull
+
+# Pull a specific version
+dotenvx-deploy bw-pull --name client-a
+
+# Pull specific environment and version
+dotenvx-deploy bw-pull -e production --name v2
+```
+
+When multiple versions exist for an environment, you'll be prompted to select which one to use.
+
+### `bw-list`
+
+List all saved keys in Bitwarden.
+
+```bash
+dotenvx-deploy bw-list [options]
+
+Options:
+  --all                    Show all projects (not just current)
+  --folder <folder>        Bitwarden folder name (default: dotenvx-keys)
+```
+
+**Example output:**
+```
+my-app/
+  root - "Main development keys" (1/15/2026)
+  production [2 versions]
+    └─ client-a - "Keys for Client A" (1/10/2026)
+    └─ client-b - "Keys for Client B" (1/12/2026)
+  staging (1/14/2026)
+
+2 key(s) in 1 project(s)
+```
 
 ### `status`
 

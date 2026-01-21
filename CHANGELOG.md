@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-01-21
+
+### Added
+
+- **Version support for Bitwarden keys**: Save and manage multiple versions of keys
+  - `bw-save --name <version>`: Save keys with a version name (e.g., "client-a", "v2", "backup")
+  - `bw-save --note <note>`: Add a description to saved keys
+  - `bw-pull --name <version>`: Pull a specific version
+  - When multiple versions exist, `bw-pull` prompts to select which one to use
+
+- **`bw-list` command**: View all saved keys in Bitwarden
+  - Groups keys by project and environment
+  - Shows version names, notes, and timestamps
+  - Use `--all` to show all projects (not just current)
+
+### Fixed
+
+- Support for base `.env` file (without environment suffix)
+  - Keys for `.env` are now stored as `DOTENV_PRIVATE_KEY` (no suffix)
+  - Properly detected and saved to Bitwarden as `project/root`
+
 ## [1.0.0] - 2026-01-21
 
 ### Added
@@ -69,4 +90,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bitwarden integration for secure key backup and sharing
 - Key rotation support for security best practices
 
+[1.1.0]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.1.0
 [1.0.0]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.0

@@ -8,6 +8,7 @@ import { encryptCommand } from '../lib/commands/encrypt.js';
 import { rotateCommand } from '../lib/commands/rotate.js';
 import { bwSaveCommand } from '../lib/commands/bw-save.js';
 import { bwPullCommand } from '../lib/commands/bw-pull.js';
+import { bwListCommand } from '../lib/commands/bw-list.js';
 import { statusCommand } from '../lib/commands/status.js';
 
 const program = new Command();
@@ -15,7 +16,7 @@ const program = new Command();
 program
   .name('dotenvx-deploy')
   .description('CLI for managing dotenvx encryption with Vercel deployment and Bitwarden integration')
-  .version('1.0.0');
+  .version('1.1.0');
 
 program
   .command('init')
@@ -53,6 +54,8 @@ program
   .command('bw-save')
   .description('Save private keys to Bitwarden')
   .option('-e, --env <environment>', 'Environment to save (default: all)')
+  .option('-n, --name <name>', 'Version name (e.g., "client-a", "v2", "backup")')
+  .option('--note <note>', 'Add a note/description to the saved key')
   .option('--folder <folder>', 'Bitwarden folder name', 'dotenvx-keys')
   .action(bwSaveCommand);
 
@@ -60,8 +63,16 @@ program
   .command('bw-pull')
   .description('Pull private keys from Bitwarden')
   .option('-e, --env <environment>', 'Environment to pull (default: all)')
+  .option('-n, --name <name>', 'Pull a specific version by name')
   .option('--folder <folder>', 'Bitwarden folder name', 'dotenvx-keys')
   .action(bwPullCommand);
+
+program
+  .command('bw-list')
+  .description('List all saved keys in Bitwarden')
+  .option('--all', 'Show all projects (not just current)')
+  .option('--folder <folder>', 'Bitwarden folder name', 'dotenvx-keys')
+  .action(bwListCommand);
 
 program
   .command('status')
