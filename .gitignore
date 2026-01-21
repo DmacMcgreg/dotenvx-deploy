@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+
+# Test files
+.env.keys
+.env.keys.backup.*
+.env.production
+.env.preview
+.env.staging
+.env.development
