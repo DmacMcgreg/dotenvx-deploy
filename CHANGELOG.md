@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-01-21
+
+### Fixed
+
+- Fix GitHub Actions workflow using deprecated `macos-13` runner
+- Update to `macos-15-large` for x64 builds
+
+### Added
+
+- Manual workflow dispatch trigger for releases
+
 ## [1.0.1] - 2026-01-21
 
 ### Fixed
@@ -86,5 +97,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bitwarden integration for secure key backup and sharing
 - Key rotation support for security best practices
 
+[1.0.2]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.2
 [1.0.1]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.1
 [1.0.0]: https://github.com/DmacMcgreg/dotenvx-deploy/releases/tag/v1.0.0
